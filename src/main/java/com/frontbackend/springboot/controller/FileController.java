@@ -9,9 +9,20 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.xml.sax.InputSource;
 
 import javax.annotation.PostConstruct;
+import javax.xml.XMLConstants;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -42,14 +53,19 @@ public class FileController {
     }
     private String name = null;
 
-    @RequestMapping(name = "/greet", method = GET)
-    public String greet(String greetee) {
+    @GetMapping("/transform")
+    public String transform() throws TransformerException, FileNotFoundException {
+        StringWriter writer = new   StringWriter();
+        StreamResult streamResult = new StreamResult(writer);
+        TransformerFactory factory = javax.xml.transform.TransformerFactory.newInstance();
+        //factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        //factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        //factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        Transformer transformer = factory.newTransformer();
+        transformer.transform(new StreamSource(new FileReader("xxe.xml")),streamResult);
+        return writer.toString();
 
-        if (greetee != null) {
-            this.name = greetee;
-        }
 
-        return "Hello " + this.name;  // if greetee is null, you see the previous user's data
     }
     @GetMapping
     public List<FileData> list() {
