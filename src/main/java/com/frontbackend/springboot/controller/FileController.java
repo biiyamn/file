@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("api/files")
@@ -38,7 +40,17 @@ public class FileController {
         args = new HashMap<>();
         args.put("a", "&");
     }
+    private String name = null;
 
+    @RequestMapping(name = "/greet", method = GET)
+    public String greet(String greetee) {
+
+        if (greetee != null) {
+            this.name = greetee;
+        }
+
+        return "Hello " + this.name;  // if greetee is null, you see the previous user's data
+    }
     @GetMapping
     public List<FileData> list() {
         return fileService.list();
